@@ -2,6 +2,7 @@ import express, { query } from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import querystring from "querystring";
+import { runInThisContext } from "vm";
 
 const app = express();
 const port = 3000;
@@ -12,7 +13,7 @@ var redirect_uri = 'http://localhost:3000/token';
 
 var grant_type = "authorization_code";
 var code = "AQBlW6iGENs8DY-wmQmbqZfNENbS7u4X1CYRNo3K1z0r02FRx3_FLC_WQKKI-K6M-pLYvZHF0o5qEe-BpRmQgaqnCc_iOA1_o7c6A23TgarTHj5Uuh7-ZQKZR-XWOFyBZi4TVGNCrVe1o6AvNyABDYH5wq74EvAAfw";
-var bearerToken = "BQB574l6fEk1Xd2b3b4GLT4ajkbL0xKc__T7m8xl_O0mBuH4Crj6O8DL6DF_9zrKj10EInI4rtwXtxKUXdS5ih-_eHV0KsWDeAFmiS_2YzIs5eBnIfw";
+var bearerToken = "BQDOdpk7Iuoo689dlmp7-DkJN_z4ApmP-RIqUugYLJxKGId8LswX2AaYL_sqS7fRtjlZnnm3PjBOZr0ZYGnW_MVK9klepqJNVU7leULXq7sSQQfWPfE";
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
@@ -78,29 +79,27 @@ app.post('/search', async (req,res) => {
             }
         });
         // console.log(JSON.stringify(response.data));
-        var songNameArray = [];
-        var albumNameArray = [];
-        var artistNameArray = [];
-        var songRunTimeArray = [];
+
+        // This block of code creates an array of objects to send to the EJS
+        var searchedSongs = [];
         for (let i=0;i<response.data.tracks.items.length;i++){
-            songNameArray[i] = response.data.tracks.items[i].name;
-            albumNameArray[i] = response.data.tracks.items[i].album.name;
-            for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
-                //console.log("i index: "+ i + " | j index: "+ j);
-                //console.log(response.data.tracks.items[i].artists.length);
-                artistNameArray[j] = response.data.tracks.items[i].artists[j].name;
-            }
             let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
             let songMinutes = Math.floor(convertToSeconds/60);
-            let songSeconds = convertToSeconds % 60;
-            songRunTimeArray[i] = songMinutes + songSeconds;
-        }
-        // console.log("Success: " + JSON.stringify(response.data));
+            let songSeconds = Math.floor(convertToSeconds % 60);
+            var artistNameArray = [];
+            for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
+                artistNameArray.push(response.data.tracks.items[i].artists[j].name);
+            } 
+            searchedSongs[i] = {
+                songName: response.data.tracks.items[i].name,
+                albumName: response.data.tracks.items[i].album.name,
+                artistName: artistNameArray,
+                songRunTime: songMinutes + ":" + songSeconds,
+            }
+        }   
+        // console.log(JSON.stringify(searchedSongs));
         res.render('index.ejs', {
-            songName:songNameArray,
-            albumName:albumNameArray,
-            artistName:artistNameArray,
-            songRunTime:songRunTimeArray,
+            data: searchedSongs,
         })
     } catch (error) {
         console.log("An error occured: " + error);
@@ -111,3 +110,28 @@ app.post('/search', async (req,res) => {
 app.listen(port, ()=>{
     console.log("Server running on port: " + port);
 })
+
+
+// for (let i=0;i<response.data.tracks.items.length;i++){
+//     console.log(artistNameArray);
+//     songNameArray[i] = response.data.tracks.items[i].name;
+//     albumNameArray[i] = response.data.tracks.items[i].album.name;
+//     for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
+//         //console.log("i index: "+ i + " | j index: "+ j);
+//         //console.log(response.data.tracks.items[i].artists.length);
+//         artistNameArray[j] = response.data.tracks.items[i].artists[j].name;
+//     }
+//     let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
+//     let songMinutes = Math.floor(convertToSeconds/60);
+//     let songSeconds = convertToSeconds % 60;
+//     songRunTimeArray[i] = songMinutes + songSeconds;
+// }
+        // songName:songNameArray,
+        // albumName:albumNameArray,
+        // artistName:artistNameArray,
+        // songRunTime:songRunTimeArray,
+
+        // console.log("Song name array Length: " + songNameArray.length);
+        // console.log("Album name array Length: " + albumNameArray.length);
+        // console.log("Artist name array Length: " + artistNameArray.length);
+        // console.log("Run Time array Length: " + songRunTimeArray.length);
