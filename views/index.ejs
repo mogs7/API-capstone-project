@@ -1,0 +1,47 @@
+<%- include('partials/header.ejs') %>
+
+<h1 class="text-cyan-400">Hello World!</h1>
+<!-- <button formaction="/" formmethod="post">Redirect to home link</button> -->
+
+<form method="get">
+    <label for="submit">Login:</label>
+    <input type="submit" formaction="/login">
+    <label for="submit">Get Auth Token:</label>
+    <input type="submit" formaction="/token">
+</form>
+
+<form action="/search" method="post">
+    <label for="songQuery">Search for a song:</label>
+    <input type="text" id="songQuery" name="songQuery">
+    <label for="searchType">Select search type:</label>
+    <select name="searchType" id="searchType">
+        <option value="artist">Artist</option>
+        <option value="album">Album</option>
+        <option value="track">Song Name</option>
+    </select>
+    <label for="searchLimit">Limit:</label>
+    <input type="number" name="searchLimit" id="searchLimit">
+    <button type="submit">Search!</button>
+</form>
+
+<form action="/showBearer" method="post">
+    <label for="submit">Show Bearer Token:</label>
+    <input type="submit" formaction="/showBearer">
+</form>
+
+<% if (locals.data) { %>
+    <%= data %>
+<% } %>
+
+<% if (locals.songName) { %>
+    <h1><%= songName %></h1>
+    <h1><%= albumName %></h1>
+    <h1><%= artistName %></h1>
+    <h1><%= songRunTime %></h1>
+<% } %>
+
+<% if (locals.bearToken) { %>
+    <h1>Your bearer token is: <%= bearToken %></h1>
+<% } %>
+    
+<%- include('partials/footer.ejs') %>
