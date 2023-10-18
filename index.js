@@ -7,13 +7,29 @@ import { readFileSync } from "fs";
 const app = express();
 const port = 3000;
 
-var client_id = '5876b387b5374cb5b6c69a1acacab167';
-var client_secret = 'e0961ef2c2da441eade62da54520b250';
+// Study this block of code during free time. Its function is to
+// take the contents of the credentials.txt file and store them into
+// a map where we can then store the values into variables.
+var importCredentials = readFileSync('credentials.txt','utf-8');
+var splitToLines = importCredentials.split('\n');
+var credentialsMap = {};
+for (let i=0;i<splitToLines.length;i++){
+    const [key, value] = splitToLines[i].split(':').map(trimEnd => trimEnd.trim());
+    credentialsMap[key] = value;
+}
+// console.log(credentialsMap);
+
+var client_id = credentialsMap.ClientID;
+var client_secret = credentialsMap.ClientSecret;
 var redirect_uri = 'http://localhost:3000/token';
 
-var grant_type = "authorization_code";
-var code = "AQBlW6iGENs8DY-wmQmbqZfNENbS7u4X1CYRNo3K1z0r02FRx3_FLC_WQKKI-K6M-pLYvZHF0o5qEe-BpRmQgaqnCc_iOA1_o7c6A23TgarTHj5Uuh7-ZQKZR-XWOFyBZi4TVGNCrVe1o6AvNyABDYH5wq74EvAAfw";
-var bearerToken = readFileSync('token.txt', 'utf8').trim();
+var bearerToken = credentialsMap.BearerToken;
+
+console.log({
+    client_id,
+    client_secret,
+    bearerToken
+})
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
@@ -21,7 +37,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static('public'));
 
 app.get('/', (req,res) => {
-    res.render('index.ejs');
+    res.render('login.ejs');
 })
 
 app.get('/login', (req,res) => {
@@ -38,8 +54,8 @@ app.get('/login', (req,res) => {
 })
 
 app.get('/token', async (req,res) => {
-    console.log(JSON.stringify(req.query));
-    console.log(JSON.stringify(req.body));
+    // console.log(JSON.stringify(req.query));
+    // console.log(JSON.stringify(req.body));
     try {
         const response = await axios.post('https://accounts.spotify.com/api/token/', data,{
             headers: {
@@ -49,7 +65,6 @@ app.get('/token', async (req,res) => {
         });
         bearerToken = response.data.access_token;
         res.render('index.ejs', {data: "Logged in and Bearer Token updated!: " + bearerToken}) 
-        //console.log(response);
     } catch (error) {
         console.log(error);
     }
@@ -63,13 +78,11 @@ app.post('/showBearer', (req,res) =>{
 })
 
 app.post('/search', async (req,res) => {
-    // console.log(req.body.songQuery);
-    // console.log(req.body);
-    //console.log(bearerToken);
+    console.log(req.body.searchItem);
     try {
         const response = await axios.get('https://api.spotify.com/v1/search?' +
         querystring.stringify({
-            q: req.body.songQuery,
+            q: req.body.searchItem,
             type: req.body.searchType,
             limit: req.body.searchLimit,
         })
@@ -91,13 +104,7 @@ app.post('/search', async (req,res) => {
             res.render('index.ejs', {
                 data: artistData(response),
             })
-        }
-        // console.log(JSON.stringify(response.data));
-
-        // This block of code creates an array of objects to send to the EJS
-         
-        // console.log(JSON.stringify(searchedSongs));
-        
+        }  
     } catch (error) {
         console.log("An error occured: " + error);
         console.error("Error: " + error.message);
@@ -107,8 +114,6 @@ app.post('/search', async (req,res) => {
 app.listen(port, ()=>{
     console.log("Server running on port: " + port);
 })
-
-
 
 
 function trackData(response){
@@ -161,7 +166,7 @@ function artistData(response){
             for (let j=0; j<response.data.artists.items[i].genres.length;j++){
                 let genreStringCapitalize = response.data.artists.items[i].genres[j];
                 // console.log(genreStringCapitalize);
-                let genreStringFormat = genreStringCapitalize.charAt(0).toUpperCase() + genreStringCapitalize.slice(1);
+                let genreStringFormat = " "+genreStringCapitalize.charAt(0).toUpperCase() + genreStringCapitalize.slice(1);
                 artistGenreArray.push(genreStringFormat);
             } 
             
