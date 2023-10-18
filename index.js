@@ -2,7 +2,7 @@ import express, { query } from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import querystring from "querystring";
-import { runInThisContext } from "vm";
+import { readFileSync } from "fs";
 
 const app = express();
 const port = 3000;
@@ -13,7 +13,7 @@ var redirect_uri = 'http://localhost:3000/token';
 
 var grant_type = "authorization_code";
 var code = "AQBlW6iGENs8DY-wmQmbqZfNENbS7u4X1CYRNo3K1z0r02FRx3_FLC_WQKKI-K6M-pLYvZHF0o5qEe-BpRmQgaqnCc_iOA1_o7c6A23TgarTHj5Uuh7-ZQKZR-XWOFyBZi4TVGNCrVe1o6AvNyABDYH5wq74EvAAfw";
-var bearerToken = "BQCPkJHyOHbSOUO_kSE2BNzf3P4DkUlgvruk39qR7kCwNlI5rzjX3imGOppatrMoaWJs-tml_cLm5HOIc74pYUltQUYzSkAZD_dFDyaz5kUwyu0_0fw";
+var bearerToken = readFileSync('token.txt', 'utf8').trim();
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
