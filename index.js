@@ -13,7 +13,7 @@ var redirect_uri = 'http://localhost:3000/token';
 
 var grant_type = "authorization_code";
 var code = "AQBlW6iGENs8DY-wmQmbqZfNENbS7u4X1CYRNo3K1z0r02FRx3_FLC_WQKKI-K6M-pLYvZHF0o5qEe-BpRmQgaqnCc_iOA1_o7c6A23TgarTHj5Uuh7-ZQKZR-XWOFyBZi4TVGNCrVe1o6AvNyABDYH5wq74EvAAfw";
-var bearerToken = "BQDOdpk7Iuoo689dlmp7-DkJN_z4ApmP-RIqUugYLJxKGId8LswX2AaYL_sqS7fRtjlZnnm3PjBOZr0ZYGnW_MVK9klepqJNVU7leULXq7sSQQfWPfE";
+var bearerToken = "BQBeKP1hF4CzHd2VB_bGb0Htb5f7dhdO8dj11Pz_bp0X2Lc5XOe1vTWdZyk1dBlWMmux5DHz5JVIDpspEk74QojcAsraz311WyY30M--q6Tw4Psf2II";
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
@@ -65,7 +65,7 @@ app.post('/showBearer', (req,res) =>{
 app.post('/search', async (req,res) => {
     // console.log(req.body.songQuery);
     // console.log(req.body);
-    console.log(bearerToken);
+    //console.log(bearerToken);
     try {
         const response = await axios.get('https://api.spotify.com/v1/search?' +
         querystring.stringify({
@@ -85,7 +85,8 @@ app.post('/search', async (req,res) => {
         for (let i=0;i<response.data.tracks.items.length;i++){
             let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
             let songMinutes = Math.floor(convertToSeconds/60);
-            let songSeconds = Math.floor(convertToSeconds % 60);
+            let songSeconds = String(Math.floor(convertToSeconds % 60)).padStart(2,'0');
+            console.log("Min: " + songMinutes + " | Sec: "+ songSeconds);
             var artistNameArray = [];
             for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
                 artistNameArray.push(response.data.tracks.items[i].artists[j].name);
@@ -95,6 +96,7 @@ app.post('/search', async (req,res) => {
                 albumName: response.data.tracks.items[i].album.name,
                 artistName: artistNameArray,
                 songRunTime: songMinutes + ":" + songSeconds,
+                songCover: response.data.tracks.items[i].album.images[0].url,
             }
         }   
         // console.log(JSON.stringify(searchedSongs));
@@ -135,3 +137,28 @@ app.listen(port, ()=>{
         // console.log("Album name array Length: " + albumNameArray.length);
         // console.log("Artist name array Length: " + artistNameArray.length);
         // console.log("Run Time array Length: " + songRunTimeArray.length);
+
+
+
+
+// <% if (locals.data) { %>
+//     <% for(let i=0;i<data.length;i++) { %>
+//         <ul class="w-1/4 h-1/4 bg-slate-600 mb-8 p-4 box-border">
+//             <li>Song Name: <%=data[i].songName%></li>
+//             <li>Album Name: <%=data[i].albumName%></li>
+//             <li>Artists Name: <%=data[i].artistName%></li>
+//             <li>Song Run Time: <%=data[i].songRunTime%></li>
+//         </ul>
+//     <% } %>
+// <% } %>
+
+{/* <h1>Test card</h1>
+<div class="flex w-screen justify-center">
+    <img src="https://i.scdn.co/image/ab67616d0000b2731f44db452a68e229650a302c" alt="">
+    <div class="song-details-div">
+        <h2>Escapism</h2>
+        <h3>Escapsim</h3>
+        <h3>TEMPLIME, some Japanese artist</h3>
+        <h4>4:21</h4>
+    </div>
+</div> */}

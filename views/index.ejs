@@ -29,24 +29,24 @@
     <input type="submit" formaction="/showBearer">
 </form>
 
-<% if (locals.data) { %>
-    <% for(let i=0;i<data.length;i++) { %>
-        <ul class="w-1/4 h-1/4 bg-slate-600 mb-8 p-4 box-border">
-            <li>Song Name: <%=data[i].songName%></li>
-            <li>Album Name: <%=data[i].albumName%></li>
-            <li>Artists Name: <%=data[i].artistName%></li>
-            <li>Song Run Time: <%=data[i].songRunTime%></li>
-        </ul>
+<div class="grid grid-cols-3 w-screen h-1/2">
+    <% if (locals.data) { %>
+        <% for(let i=0;i<data.length;i++) { %>
+            <div class="flex justify-center mb-4">
+                <img src=<%=data[i].songCover%> alt="">
+                <div class="song-details-div">
+                    <h2><%=data[i].songName%></h2>
+                    <h3><%=data[i].albumName%></h3>
+                    <h3><%=data[i].artistName%></h3>
+                    <h4><%=data[i].songRunTime%></h4>
+                </div>
+            </div>
+        <% } %>
     <% } %>
-<% } %>
+</div>
 
-<h1>Test card</h1>
-<ul style="background-image: url('https://i.scdn.co/image/ab67616d0000b2731f44db452a68e229650a302c');">
-    <li>Escapism</li>
-    <li>Escapsim</li>
-    <li>TEMPLIME, some Japanese artist</li>
-    <li>4:21</li>
-</ul>
+
+
 
 <% if (locals.bearToken) { %>
     <h1>Your bearer token is: <%= bearToken %></h1>

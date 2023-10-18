@@ -4,15 +4,35 @@ body {
     background-size: cover;
     color: white;
     font-family: 'Roboto Condensed', sans-serif;
+    overflow-x: hidden;
 }
 
-ul{
+body::-webkit-scrollbar{
+    display: none;
+}
+
+img{
     box-sizing: border-box;
     border-radius: 20px;
-    background-color: #3500D4;
-    height: 350px;
-    width: 350px;
-    padding: 25px;
+    height: 150px;
+    width: 150px;
     background-repeat: no-repeat;
     background-size: contain;
+    z-index: 3;
+}
+
+.song-details-div{
+    box-sizing: border-box;
+    border-radius: 0 20px 20px 0;
+    padding: 25px 25px 25px 50px;
+    margin-left: -25px;
+    height: 150px;
+    width: 300px;
+    background-color: #2400905a;
+    z-index: 1;
+    overflow-y: scroll;
+}
+
+.song-details-div::-webkit-scrollbar{
+    display: none;
 }
