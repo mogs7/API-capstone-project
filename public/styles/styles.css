@@ -1,0 +1,18 @@
+body {
+    background-image: url("../images/flat-mountains\(blackandblue\).svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+ul{
+    box-sizing: border-box;
+    border-radius: 20px;
+    background-color: #3500D4;
+    height: 350px;
+    width: 350px;
+    padding: 25px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}

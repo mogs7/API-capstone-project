@@ -31,7 +31,7 @@
 
 <% if (locals.data) { %>
     <% for(let i=0;i<data.length;i++) { %>
-        <ul>
+        <ul class="w-1/4 h-1/4 bg-slate-600 mb-8 p-4 box-border">
             <li>Song Name: <%=data[i].songName%></li>
             <li>Album Name: <%=data[i].albumName%></li>
             <li>Artists Name: <%=data[i].artistName%></li>
@@ -39,6 +39,14 @@
         </ul>
     <% } %>
 <% } %>
+
+<h1>Test card</h1>
+<ul style="background-image: url('https://i.scdn.co/image/ab67616d0000b2731f44db452a68e229650a302c');">
+    <li>Escapism</li>
+    <li>Escapsim</li>
+    <li>TEMPLIME, some Japanese artist</li>
+    <li>4:21</li>
+</ul>
 
 <% if (locals.bearToken) { %>
     <h1>Your bearer token is: <%= bearToken %></h1>
