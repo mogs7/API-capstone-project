@@ -20,7 +20,7 @@
         <option value="track">Song Name</option>
     </select>
     <label for="searchLimit">Limit:</label>
-    <input type="number" name="searchLimit" id="searchLimit">
+    <input type="number" name="searchLimit" id="searchLimit" value="21">
     <button type="submit">Search!</button>
 </form>
 
@@ -31,17 +31,42 @@
 
 <div class="grid grid-cols-3 w-screen h-1/2">
     <% if (locals.data) { %>
-        <% for(let i=0;i<data.length;i++) { %>
-            <div class="flex justify-center mb-4">
-                <img src=<%=data[i].songCover%> alt="">
-                <div class="song-details-div">
-                    <h2><%=data[i].songName%></h2>
-                    <h3><%=data[i].albumName%></h3>
-                    <h3><%=data[i].artistName%></h3>
-                    <h4><%=data[i].songRunTime%></h4>
+        <% if (locals.data[0].searchType == "song") { %>
+            <% for(let i=0;i<data.length;i++) { %>
+                <div class="flex justify-center mb-4">
+                    <img src=<%=data[i].songCover%> alt="">
+                    <div class="details-div">
+                        <h2><%=data[i].songName%></h2>
+                        <h3><%=data[i].albumName%></h3>
+                        <h3><%=data[i].artistName%></h3>
+                        <h4><%=data[i].songRunTime%></h4>
+                    </div>
                 </div>
-            </div>
-        <% } %>
+            <% } %>
+        <% } else if (locals.data[0].searchType == "album") {%>
+            <% for(let i=0;i<data.length;i++) { %>
+                <div class="flex justify-center mb-4">
+                    <img src=<%=data[i].albumCover%> alt="">
+                    <div class="details-div">
+                        <h2><%=data[i].albumName%></h2>
+                        <h3><%=data[i].artistName%></h3>
+                        <h3><%=data[i].albumType%></h3>
+                        <h4><%=data[i].albumYear%></h4>
+                    </div>
+                </div>
+            <% } %>
+        <% } else if (locals.data[0].searchType == "artist") {%>
+            <% for(let i=0;i<data.length;i++) { %>
+                <div class="flex justify-center mb-4">
+                    <img src=<%=data[i].artistPicture%> alt="">
+                    <div class="details-div">
+                        <h2><%=data[i].artistName%></h2>
+                        <h3><%=data[i].artistGenre%></h3>
+                        <h4><%=data[i].artistFollowers%></h4>
+                    </div>
+                </div>
+            <% } %>
+        <% } %>%>
     <% } %>
 </div>
 

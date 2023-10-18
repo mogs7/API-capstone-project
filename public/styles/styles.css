@@ -21,7 +21,7 @@ img{
     z-index: 3;
 }
 
-.song-details-div{
+.details-div{
     box-sizing: border-box;
     border-radius: 0 20px 20px 0;
     padding: 25px 25px 25px 50px;
@@ -33,6 +33,6 @@ img{
     overflow-y: scroll;
 }
 
-.song-details-div::-webkit-scrollbar{
+.details-div::-webkit-scrollbar{
     display: none;
 }

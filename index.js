@@ -13,7 +13,7 @@ var redirect_uri = 'http://localhost:3000/token';
 
 var grant_type = "authorization_code";
 var code = "AQBlW6iGENs8DY-wmQmbqZfNENbS7u4X1CYRNo3K1z0r02FRx3_FLC_WQKKI-K6M-pLYvZHF0o5qEe-BpRmQgaqnCc_iOA1_o7c6A23TgarTHj5Uuh7-ZQKZR-XWOFyBZi4TVGNCrVe1o6AvNyABDYH5wq74EvAAfw";
-var bearerToken = "BQBeKP1hF4CzHd2VB_bGb0Htb5f7dhdO8dj11Pz_bp0X2Lc5XOe1vTWdZyk1dBlWMmux5DHz5JVIDpspEk74QojcAsraz311WyY30M--q6Tw4Psf2II";
+var bearerToken = "BQCPkJHyOHbSOUO_kSE2BNzf3P4DkUlgvruk39qR7kCwNlI5rzjX3imGOppatrMoaWJs-tml_cLm5HOIc74pYUltQUYzSkAZD_dFDyaz5kUwyu0_0fw";
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
@@ -78,31 +78,26 @@ app.post('/search', async (req,res) => {
                 'Authorization':'Bearer '+ bearerToken,
             }
         });
+        if (req.body.searchType == "track"){
+            res.render('index.ejs', {
+                data: trackData(response),
+            })
+        } else if (req.body.searchType == "album"){
+            res.render('index.ejs', {
+                data: albumData(response),
+            })
+        } else if (req.body.searchType == "artist"){
+            console.log(artistData(response));
+            res.render('index.ejs', {
+                data: artistData(response),
+            })
+        }
         // console.log(JSON.stringify(response.data));
 
         // This block of code creates an array of objects to send to the EJS
-        var searchedSongs = [];
-        for (let i=0;i<response.data.tracks.items.length;i++){
-            let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
-            let songMinutes = Math.floor(convertToSeconds/60);
-            let songSeconds = String(Math.floor(convertToSeconds % 60)).padStart(2,'0');
-            console.log("Min: " + songMinutes + " | Sec: "+ songSeconds);
-            var artistNameArray = [];
-            for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
-                artistNameArray.push(response.data.tracks.items[i].artists[j].name);
-            } 
-            searchedSongs[i] = {
-                songName: response.data.tracks.items[i].name,
-                albumName: response.data.tracks.items[i].album.name,
-                artistName: artistNameArray,
-                songRunTime: songMinutes + ":" + songSeconds,
-                songCover: response.data.tracks.items[i].album.images[0].url,
-            }
-        }   
+         
         // console.log(JSON.stringify(searchedSongs));
-        res.render('index.ejs', {
-            data: searchedSongs,
-        })
+        
     } catch (error) {
         console.log("An error occured: " + error);
         console.error("Error: " + error.message);
@@ -112,6 +107,77 @@ app.post('/search', async (req,res) => {
 app.listen(port, ()=>{
     console.log("Server running on port: " + port);
 })
+
+
+
+
+function trackData(response){
+    var songInfo = [];
+        for (let i=0;i<response.data.tracks.items.length;i++){
+            let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
+            let songMinutes = Math.floor(convertToSeconds/60);
+            let songSeconds = String(Math.floor(convertToSeconds % 60)).padStart(2,'0');
+            // console.log("Min: " + songMinutes + " | Sec: "+ songSeconds);
+            var artistNameArray = [];
+            for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
+                artistNameArray.push(response.data.tracks.items[i].artists[j].name);
+            } 
+            songInfo[i] = {
+                searchType: "song",
+                songName: response.data.tracks.items[i].name,
+                albumName: response.data.tracks.items[i].album.name,
+                artistName: artistNameArray,
+                songRunTime: songMinutes + ":" + songSeconds,
+                songCover: response.data.tracks.items[i].album.images[0].url,
+            }
+        }  
+        return songInfo;
+}
+
+function albumData(response){
+    var albumInfo = [];
+        for (let i=0;i<response.data.albums.items.length;i++){
+            var artistNameArray = [];
+            for (let j=0; j<response.data.albums.items[i].artists.length;j++){
+                artistNameArray.push(response.data.albums.items[i].artists[j].name);
+            } 
+            let albumTypeString = response.data.albums.items[i].album_type;
+            albumInfo[i] = {
+                searchType: "album",
+                albumName: response.data.albums.items[i].name,
+                artistName: artistNameArray,
+                albumType: albumTypeString.charAt(0).toUpperCase() + albumTypeString.slice(1),
+                albumYear: String(response.data.albums.items[i].release_date).substring(0,4),
+                albumCover: response.data.albums.items[i].images[0].url,
+            }
+        }  
+        return albumInfo;
+}
+
+function artistData(response){
+    var artistInfo = [];
+        for (let i=0;i<response.data.artists.items.length;i++){
+            var artistGenreArray = [];
+            for (let j=0; j<response.data.artists.items[i].genres.length;j++){
+                let genreStringCapitalize = response.data.artists.items[i].genres[j];
+                // console.log(genreStringCapitalize);
+                let genreStringFormat = genreStringCapitalize.charAt(0).toUpperCase() + genreStringCapitalize.slice(1);
+                artistGenreArray.push(genreStringFormat);
+            } 
+            
+            let imageObject = response.data.artists.items[i].images[0];
+            let hasPicture = imageObject?.url || "https://cdn.pixabay.com/photo/2015/11/03/08/56/question-mark-1019820_960_720.jpg";
+
+            artistInfo[i] = {
+                searchType: "artist",
+                artistName: response.data.artists.items[i].name,
+                artistGenre: artistGenreArray,
+                artistFollowers: (response.data.artists.items[i].followers.total).toLocaleString() + " followers",
+                artistPicture: hasPicture,
+            }
+        }  
+        return artistInfo;
+}
 
 
 // for (let i=0;i<response.data.tracks.items.length;i++){
