@@ -1,10 +1,10 @@
 <%- include('partials/header.ejs');%>
 
-<form method="get">
-    <label for="submit">Login:</label>
-    <input type="submit" formaction="/login">
-    <label for="submit">Get Auth Token:</label>
-    <input type="submit" formaction="/token">
+<form method="get" class="flex flex-col h-screen w-screen justify-center items-center">
+    <label for="submit" class="text-[4rem] font-extrabold">You'll need to login to use this app</label>
+    <input type="submit" formaction="/login" value="Click here!" class="text-[2rem] font-extrabold py-5 px-7 bg-[#230090] rounded-lg border-solid border-[#0C0032] border-4 cursor-pointer hover:bg-[#4f14ff] hover:border-[#0F172A] ease-in duration-150">
+    <!-- <label for="submit">Get Auth Token:</label>
+    <input type="submit" formaction="/token"> -->
 </form>
 
 <%- include('partials/footer.ejs');%>

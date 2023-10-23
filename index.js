@@ -2,7 +2,7 @@ import express, { query } from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import querystring from "querystring";
-import { readFileSync } from "fs";
+import { readFileSync, appendFileSync, writeFileSync  } from "fs";
 
 const app = express();
 const port = 3000;
@@ -49,7 +49,7 @@ app.get('/login', (req,res) => {
         redirect_uri: redirect_uri,
         }));
     } catch (error) {
-        console.log(error)
+        console.log(error.message)
     }
 })
 
@@ -63,7 +63,14 @@ app.get('/token', async (req,res) => {
                 'Content-Type': 'application/x-www-form-urlencoded' 
             },
         });
-        bearerToken = response.data.access_token;
+        let writeTokenToFile = response.data.access_token;
+        // console.log(writeTokenToFile);
+        let writePath = "C:/Users/MIGUEL MOLINA/Desktop/Programming Files/Dr. Angela Yu's Web Dev Course Files/APIs/Capstone Project/credentials.txt";
+        splitToLines[0] = "BearerToken:"+writeTokenToFile;
+        // console.log(splitToLines);
+        // Update credentials.txt
+        writeFileSync(writePath, splitToLines.join('\n'));
+        
         res.render('index.ejs', {data: "Logged in and Bearer Token updated!: " + bearerToken}) 
     } catch (error) {
         console.log(error);
