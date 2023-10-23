@@ -7,9 +7,7 @@ import { readFileSync, appendFileSync, writeFileSync  } from "fs";
 const app = express();
 const port = 3000;
 
-// Study this block of code during free time. Its function is to
-// take the contents of the credentials.txt file and store them into
-// a map where we can then store the values into variables.
+// Read contents of file and store its values into a map
 var importCredentials = readFileSync('credentials.txt','utf-8');
 var splitToLines = importCredentials.split('\n');
 var credentialsMap = {};
@@ -25,11 +23,11 @@ var redirect_uri = 'http://localhost:3000/token';
 
 var bearerToken = credentialsMap.BearerToken;
 
-console.log({
-    client_id,
-    client_secret,
-    bearerToken
-})
+// console.log({
+//     client_id,
+//     client_secret,
+//     bearerToken
+// })
 
 const data = querystring.stringify({'grant_type':'client_credentials'});
 
@@ -68,6 +66,7 @@ app.get('/token', async (req,res) => {
         let writePath = "C:/Users/MIGUEL MOLINA/Desktop/Programming Files/Dr. Angela Yu's Web Dev Course Files/APIs/Capstone Project/credentials.txt";
         splitToLines[0] = "BearerToken:"+writeTokenToFile;
         // console.log(splitToLines);
+        
         // Update credentials.txt
         writeFileSync(writePath, splitToLines.join('\n'));
         
@@ -77,21 +76,18 @@ app.get('/token', async (req,res) => {
     }
 })
 
-app.post('/showBearer', (req,res) =>{
-    console.log("BearToken: " + bearerToken);
-    res.render('index.ejs',{
-        bearToken: bearerToken,
-    })
-})
-
 app.post('/search', async (req,res) => {
-    console.log(req.body.searchItem);
+    console.log(req.body);
+    let searchVal = req.body.searchLimit;
+    if (searchVal == ''){
+        searchVal = 18;
+    }
     try {
         const response = await axios.get('https://api.spotify.com/v1/search?' +
         querystring.stringify({
             q: req.body.searchItem,
             type: req.body.searchType,
-            limit: req.body.searchLimit,
+            limit: searchVal,
         })
         ,{
             headers: {
@@ -190,53 +186,3 @@ function artistData(response){
         }  
         return artistInfo;
 }
-
-
-// for (let i=0;i<response.data.tracks.items.length;i++){
-//     console.log(artistNameArray);
-//     songNameArray[i] = response.data.tracks.items[i].name;
-//     albumNameArray[i] = response.data.tracks.items[i].album.name;
-//     for (let j=0; j<response.data.tracks.items[i].artists.length;j++){
-//         //console.log("i index: "+ i + " | j index: "+ j);
-//         //console.log(response.data.tracks.items[i].artists.length);
-//         artistNameArray[j] = response.data.tracks.items[i].artists[j].name;
-//     }
-//     let convertToSeconds = response.data.tracks.items[i].duration_ms/1000;
-//     let songMinutes = Math.floor(convertToSeconds/60);
-//     let songSeconds = convertToSeconds % 60;
-//     songRunTimeArray[i] = songMinutes + songSeconds;
-// }
-        // songName:songNameArray,
-        // albumName:albumNameArray,
-        // artistName:artistNameArray,
-        // songRunTime:songRunTimeArray,
-
-        // console.log("Song name array Length: " + songNameArray.length);
-        // console.log("Album name array Length: " + albumNameArray.length);
-        // console.log("Artist name array Length: " + artistNameArray.length);
-        // console.log("Run Time array Length: " + songRunTimeArray.length);
-
-
-
-
-// <% if (locals.data) { %>
-//     <% for(let i=0;i<data.length;i++) { %>
-//         <ul class="w-1/4 h-1/4 bg-slate-600 mb-8 p-4 box-border">
-//             <li>Song Name: <%=data[i].songName%></li>
-//             <li>Album Name: <%=data[i].albumName%></li>
-//             <li>Artists Name: <%=data[i].artistName%></li>
-//             <li>Song Run Time: <%=data[i].songRunTime%></li>
-//         </ul>
-//     <% } %>
-// <% } %>
-
-{/* <h1>Test card</h1>
-<div class="flex w-screen justify-center">
-    <img src="https://i.scdn.co/image/ab67616d0000b2731f44db452a68e229650a302c" alt="">
-    <div class="song-details-div">
-        <h2>Escapism</h2>
-        <h3>Escapsim</h3>
-        <h3>TEMPLIME, some Japanese artist</h3>
-        <h4>4:21</h4>
-    </div>
-</div> */}
